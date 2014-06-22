@@ -17,6 +17,7 @@ background.src = "img/sky.jpg";
 var init = function(){
 	lives = 3;	
 
+	// Take finger coordinates
 	for (var i=0;i<10;i++){
 		var finger = {
 		posX: i*120,
@@ -25,24 +26,27 @@ var init = function(){
 		fingers.push(finger);
 	};
 
+	// call bug and main control functions
 	initBug();
 	main(fingers);
 };
 
 var main = function(fingers){
+	// time controls position updates for bugs and fingers
 	var now = Date.now();
 	var delta = now - then;
 
+	// update positions according to time elapsed and draw on canvas
 	update(delta / 1000);
 	render();
 
+	// reset time
 	then = now;
 	requestAnimationFrame(main);
 };
 
-
-
 var initBug = function(){
+	// build one bug with random x position and random speed
 	for(var i=0;i<1;i++){
 		var bug = {
 			speedX: 120, // movement in pixels per second
@@ -53,6 +57,7 @@ var initBug = function(){
 		};
 
 		bug.speedX = Math.floor(Math.random()*(256+156)-156);
+		// assign appropriate image according to travel direction
 		if (bug.speedX > 0){
 			bug.path = "img/LadybugRight.png";
 		}
@@ -65,26 +70,38 @@ var initBug = function(){
 };
 
 var update = function(time){
-	count = time;
-	count -= temp;
-	if (count*10 > 1){
-		temp = time;
-		initBug();
-	}
+	// add a new ladybug every 20 seconds
+
+	console.log(time);
+	// count = time;
+	// count -= temp;
+	// if (count*10 > 1){
+	// 	temp = time;
+	// 	initBug();
+	// }
+
 
 	for(var i=0;i<bugs.length;i++){
-		if(bugs[i].fall){
+		// calculate bug position based on whether falling or not
+		for(var j=0;j<fingers.length;j++){
+			// check for bug/hand collision - if true, set fall to false, if false, set fall to true
+			if(
+				bugs[i].posX <= (fingers[j].posX + 50)
+				&& fingers[j].posX <= (bugs[i].posX + 50)
+				&& bugs[i].posY <= (fingers[j].posY + 30)
+				&& fingers[j].posY <= (bugs[i].posY + 30)
+				){
+				bugs[i].fall = false;
+			}
+			else {
+				bugs[i].fall = true;
+			}
 
-			for(var j=0;j<fingers.length;j++){
-				if(
-					bugs[i].posX <= (fingers[j].posX + 20)
-					&& fingers[j].posX <= (bugs[i].posX + 20)
-					&& bugs[i].posY <= (fingers[j].posY + 20)
-					&& fingers[j].posY <= (bugs[i].posY + 20)
-					){
-					bugs[i].fall = false;
-				}
-				else if(bugs[i].posY >= 600){
+			// check if bugs fall between cracks
+			if(bugs[i].fall){
+				bugs[i].posY = bugs[i].posY + bugs[i].speedY*time;
+
+				if(bugs[i].posY >= 600){
 					bugs[i].fall = false;
 					bugs.splice(i, 1);
 					lives -= 1;
@@ -93,39 +110,14 @@ var update = function(time){
 					}
 					else{
 						alert("You lost :(");
-						// init();
 					}
-				}
-				else {
-					bugs[i].posY = bugs[i].posY + bugs[i].speedY*time;
-					// bugs[i].fall = true;
 				}
 			}
-		}
-		else {
-			bugs[i].posX = bugs[i].posX+bugs[i].speedX*time;
-			if(bugs[i].posX >= 1200 || bugs[i].posX <= 0){
-					bugs[i].speedX = bugs[i].speedX*-1;
-					if (bugs[i].speedX > 0){
-						bugs[i].path = "img/LadybugRight.png";
-					}
-					else {
-						bugs[i].path ="img/Ladybug.png"
-					}
-					bugImage.src = bugs[i].path;
-				}
-			for(var j=0;j<fingers.length;j++){
-				if(
-					bugs[i].posX >= (fingers[j].posX + 20)
-					&& fingers[j].posX >= (bugs[i].posX + 20)
-					&& bugs[i].posY >= (fingers[j].posY + 20)
-					&& fingers[j].posY >= (bugs[i].posY + 20)
-					){
-					bugs[i].fall = true;
-				}
+			else {
+				bugs[i].posY = fingers[j].posY -30;
+				bugs[i].posX = bugs[i].posX+bugs[i].speedX*time;
 			}
 		}
-
 	};
 };
 
