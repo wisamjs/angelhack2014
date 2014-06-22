@@ -12,7 +12,8 @@ var then = Date.now();
 
 //left-hand object
 var left = (function() {
-    var left = [[],[],[],[],[]];
+    var left = [[],[],[],[],[]],
+    	palm;
 
     return {
         setFinger: function( finger, valArray ){
@@ -21,6 +22,12 @@ var left = (function() {
         },
         getFinger: function(finger){
             return left[finger];
+        },
+        getPalm: function(){
+        	return palm;
+        },
+        setPalm: function(val){
+        	palm = val;
         }
     };
 
@@ -28,7 +35,8 @@ var left = (function() {
 
 //right-hand object
 var right = (function() {
-    var right = [[],[],[],[],[]];
+    var right = [[],[],[],[],[]],
+    	palm;
 
     return {
         setFinger: function( finger, valArray ){
@@ -37,6 +45,12 @@ var right = (function() {
         },
         getFinger: function(finger){
             return right[finger];
+        },
+        getPalm: function(){
+        	return palm;
+        },
+        setPalm: function(val){
+        	palm = val;
         }
     };
 
