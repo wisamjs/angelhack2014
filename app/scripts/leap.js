@@ -24,17 +24,20 @@ $(document).ready(function(){
                 //console.log(finger);
 
                 if (hand.type === "left"){
-                    left.setPalm(hand.palmPosition);
+                    // left.setPalm(hand.palmPosition);
+                    // left.setPalmWidth(frame.data.hands[0].palmWidth);
                     if (finger.extended){
-                        left.setFinger(finger.type, finger.tipPosition);
+                        left.setFinger(finger.type,0,finger.tipPosition);
+                        left.setFinger(finger.type,1,finger.carpPosition);
                     }else{
                         left.setFinger(finger.type,[0,0,0])
                     }
 
                 }else if (hand.type === "right"){
-                    right.setPalm(hand.palmPosition);
+                    // right.setPalm(hand.palmPosition);
                      if (finger.extended){
-                         right.setFinger(finger.type, finger.tipPosition);
+                        right.setFinger(finger.type,0,finger.tipPosition);
+                        right.setFinger(finger.type,1,finger.carpPosition);
                     }else{
 
                     }
@@ -42,7 +45,6 @@ $(document).ready(function(){
 
             } //for
             updateFingers();
-            $('.finger1').text(left.getPalm());
 
         });
         if (frame.hands.length === 0){
@@ -53,6 +55,6 @@ $(document).ready(function(){
              }
         }
 
-    }).use('riggedHand',{scale:1.7, dotsMode: true})
+    }).use('riggedHand',{scale:1.3, dotsMode: false})
         .connect()
 });

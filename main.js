@@ -1,6 +1,7 @@
 var canvas=document.getElementById('myCanvas');
 var ctx=canvas.getContext('2d');
 document.body.appendChild(canvas);
+var debug;
 var lives = 3;
 var fingers = [];
 var bugs = [];
@@ -8,40 +9,27 @@ var then = Date.now();
 var temp = 0;
 var bugImage = new Image();
 var fingerImage = new Image();
-fingerImage.src= "images/cloud.png";
+fingerImage.src= "img/cloud.png";
 
 var background = new Image();
-background.src = "images/sky.jpg";
+background.src = "img/sky.jpg";
 
 var init = function(){
-	lives = 3;
+	lives = 3;	
 
-	for (var i=0;i<2;i++){
-
-		if (i <1){
-			var finger = {
-			maxX: left.getMaxX()[0],
-			minX:left.getMinX()[0],
-			maxY: left.getMaxX()[1],
-			minY: left.getMinX()[1]
-			};
-		}else{
-			var finger = {
-			maxX: right.getMaxX()[0],
-			minX:right.getMinX()[0],
-			maxY: right.getMaxX()[1],
-			minY: right.getMinX()[1]
-			};
-		}
-
+	for (var i=0;i<10;i++){
+		var finger = {
+		posX: i*120,
+		posY: 500	
+		};
 		fingers.push(finger);
 	};
 
 	initBug();
-	main();
+	main(fingers);
 };
 
-var main = function(){
+var main = function(fingers){
 	var now = Date.now();
 	var delta = now - then;
 
@@ -66,10 +54,10 @@ var initBug = function(){
 
 		bug.speedX = Math.floor(Math.random()*(256+156)-156);
 		if (bug.speedX > 0){
-			bug.path = "images/LadybugRight.png";
+			bug.path = "img/LadybugRight.png";
 		}
 		else {
-			bug.path ="images/Ladybug.png"
+			bug.path ="img/Ladybug.png"
 		}
 		bugImage.src = bug.path;
 		bugs.push(bug);
@@ -104,7 +92,7 @@ var update = function(time){
 						initBug();
 					}
 					else{
-					//	alert("You lost :(");
+						alert("You lost :(");
 						// init();
 					}
 				}
@@ -119,10 +107,10 @@ var update = function(time){
 			if(bugs[i].posX >= 1200 || bugs[i].posX <= 0){
 					bugs[i].speedX = bugs[i].speedX*-1;
 					if (bugs[i].speedX > 0){
-						bugs[i].path = "images/LadybugRight.png";
+						bugs[i].path = "img/LadybugRight.png";
 					}
 					else {
-						bugs[i].path ="images/Ladybug.png"
+						bugs[i].path ="img/Ladybug.png"
 					}
 					bugImage.src = bugs[i].path;
 				}
@@ -160,25 +148,6 @@ var render = function() {
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	ctx.fillText("Lives: " + lives, 32, 32);
-};
-
-
-//updating hand positions
-var updateFingers = function(){
-
-	// for(var j=0;j<5;j++){
-	// 	ctx.fillStyle="hsl(100, 100%, 60%)";
-	// 	ctx.fillRect(left.getFinger(j)[0] * 2,600 - left.getFinger(j)[1],100,100);
-	// 	//ctx.fillRect(fingers[j].posX,fingers[j].posY,100,100);
-
-	// 	ctx.fillStyle="hsl(100, 100%, 60%)";
-	// 	ctx.fillRect(right.getFinger(j)[0] * 2 ,600 - right.getFinger(j)[1],100,100);
-
-	// }
-
-
-
-
 };
 
 init();
