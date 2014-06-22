@@ -3,10 +3,13 @@ var ctx=canvas.getContext('2d');
 document.body.appendChild(canvas);
 var debug;
 var lives = 3;
+var score = 0;
 var fingers = [];
 var bugs = [];
+var bug = {};
 var then = Date.now();
-var temp = 0;
+var there = Date.now();
+var count = 0;
 var bugImage = new Image();
 var fingerImage = new Image();
 fingerImage.src= "img/cloud.png";
@@ -20,8 +23,10 @@ var init = function(){
 	// Take finger coordinates
 	for (var i=0;i<10;i++){
 		var finger = {
-		posX: i*120,
-		posY: 500	
+		maxX: i*120,
+		minX: 120,
+		maxY: 500,
+		minY: 0,	
 		};
 		fingers.push(finger);
 	};
@@ -34,7 +39,11 @@ var init = function(){
 var main = function(fingers){
 	// time controls position updates for bugs and fingers
 	var now = Date.now();
+	var here = Date.now();
 	var delta = now - then;
+	var change = here - there;
+
+	score = parseInt(change/1000);
 
 	// update positions according to time elapsed and draw on canvas
 	update(delta / 1000);
@@ -48,10 +57,10 @@ var main = function(fingers){
 var initBug = function(){
 	// build one bug with random x position and random speed
 	for(var i=0;i<1;i++){
-		var bug = {
+		bug = {
 			speedX: 120, // movement in pixels per second
 			speedY: 20,
-			posX: Math.floor(Math.random()*(1200)),
+			posX: Math.floor(Math.random()*(1200-100)+100),
 			posY: 0,
 			fall: true
 		};
@@ -71,14 +80,10 @@ var initBug = function(){
 
 var update = function(time){
 	// add a new ladybug every 20 seconds
-
-	console.log(time);
-	// count = time;
-	// count -= temp;
-	// if (count*10 > 1){
-	// 	temp = time;
-	// 	initBug();
-	// }
+	count += time;
+	if (count >= 20){
+		initBug();
+	}
 
 
 	for(var i=0;i<bugs.length;i++){
@@ -105,11 +110,12 @@ var update = function(time){
 					bugs[i].fall = false;
 					bugs.splice(i, 1);
 					lives -= 1;
-					if (lives >= 1){
-						initBug();
+					count = 0;
+					if (lives == 0){
+						alert("You lost!");
 					}
-					else{
-						alert("You lost :(");
+					else {
+						initBug();
 					}
 				}
 			}
@@ -122,6 +128,7 @@ var update = function(time){
 };
 
 var render = function() {
+	// draw background, bugs, fingers and text
 	ctx.drawImage(background, 0, 0);
 
 	for(var i=0;i<bugs.length;i++){
@@ -130,16 +137,21 @@ var render = function() {
 
 	for(var j=0;j<fingers.length;j++){
 		ctx.drawImage(fingerImage, fingers[j].posX, fingers[j].posY);
-		// ctx.fillStyle="hsl(100, 100%, 60%)";
-		// ctx.fillRect(fingers[j].posX,fingers[j].posY,60,60);
 	}
 
-	// Score
+	// Lives
 	ctx.fillStyle = "rgb(250, 250, 250)";
-	ctx.font = "24px Helvetica";
+	ctx.font = "30px";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	ctx.fillText("Lives: " + lives, 32, 32);
+
+	// Score
+	ctx.fillStyle = "rgb(250, 250, 250)";
+	ctx.font = "30px";
+	ctx.textAlign = "right";
+	ctx.textBaseline = "top";
+	ctx.fillText("Score: " + score, 1132, 32);
 };
 
 init();
