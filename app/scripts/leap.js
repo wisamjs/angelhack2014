@@ -1,5 +1,6 @@
 'use strict'
 var debug;
+var gameBegan = false;
 
 $(document).ready(function(){
 
@@ -18,6 +19,7 @@ $(document).ready(function(){
             //loop through each finger
             for (var i = 0, max = hand.fingers.length; i < max; i++){
                 finger = hand.fingers[i];
+
 
                 //save extended fingers x,y,z positions
                 //Debug to console
@@ -45,15 +47,21 @@ $(document).ready(function(){
 
             } //for
             updateFingers();
+            if (!gameBegan){
+                init();
+                gameBegan = true;
+            }
+            $('.finger1').text(left.getMaxX());
+
 
         });
-        if (frame.hands.length === 0){
-             for (var i = 0, max = 5; i < max; i++){
-                left.setFinger(i,[0,0,0]);
-                $('.finger1').text(left.getFinger(0));
+        // if (frame.hands.length === 0){
+        //      for (var i = 0, max = 5; i < max; i++){
+        //         left.setFinger(i,[0,0,0]);
+        //         $('.finger1').text(left.getFinger(0));
 
-             }
-        }
+        //      }
+        // }
 
     }).use('riggedHand',{scale:1.3, dotsMode: false})
         .connect()

@@ -65,6 +65,15 @@ var right = (function() {
         },
         setPalmWidth: function(val){
             palmWidth = val;
+        },
+        getMaxX:function(){
+            return right[2][0];
+        },
+        getMinX: function(){
+            return right[2][1];
+        },
+        getSlope: function(){
+            return (this.getMaxX()[1] - this.getMinX()[1])/(this.getMaxX()[0] - this.getMinX()[0]);
         }
     };
 

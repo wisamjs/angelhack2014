@@ -1,11 +1,15 @@
 var canvas=document.getElementById('myCanvas');
 var ctx=canvas.getContext('2d');
 document.body.appendChild(canvas);
+var debug;
 var lives = 3;
+var score = 0;
 var fingers = [];
 var bugs = [];
+var bug = {};
 var then = Date.now();
-var temp = 0;
+var there = Date.now();
+var count = 0;
 var bugImage = new Image();
 var fingerImage = new Image();
 fingerImage.src= "images/cloud.png";
@@ -20,8 +24,8 @@ var init = function(){
 
 		if (i <1){
 			var finger = {
-			maxX: left.getMaxX()[0],
-			minX:left.getMinX()[0],
+			maxX: left.getMaxX()[0] * 3,
+			minX:left.getMinX()[0] * 3,
 			maxY: left.getMaxX()[1],
 			minY: left.getMinX()[1]
 			};
@@ -34,6 +38,7 @@ var init = function(){
 			};
 		}
 
+		console.log(finger);
 		fingers.push(finger);
 	};
 
@@ -41,30 +46,38 @@ var init = function(){
 	main();
 };
 
-var main = function(){
-	var now = Date.now();
-	var delta = now - then;
 
+var main = function(fingers){
+	// time controls position updates for bugs and fingers
+	var now = Date.now();
+	var here = Date.now();
+	var delta = now - then;
+	var change = here - there;
+
+	score = parseInt(change/1000);
+
+	// update positions according to time elapsed and draw on canvas
 	update(delta / 1000);
 	render();
 
+	// reset time
 	then = now;
 	requestAnimationFrame(main);
 };
 
-
-
 var initBug = function(){
+	// build one bug with random x position and random speed
 	for(var i=0;i<1;i++){
-		var bug = {
+		bug = {
 			speedX: 120, // movement in pixels per second
 			speedY: 20,
-			posX: Math.floor(Math.random()*(1200)),
+			posX: Math.floor(Math.random()*(1200-100)+100),
 			posY: 0,
 			fall: true
 		};
 
 		bug.speedX = Math.floor(Math.random()*(256+156)-156);
+		// assign appropriate image according to travel direction
 		if (bug.speedX > 0){
 			bug.path = "images/LadybugRight.png";
 		}
@@ -77,71 +90,60 @@ var initBug = function(){
 };
 
 var update = function(time){
-	count = time;
-	count -= temp;
-	if (count*10 > 1){
-		temp = time;
+	// add a new ladybug every 20 seconds
+	count += time;
+	if (count >= 20){
 		initBug();
 	}
 
-	for(var i=0;i<bugs.length;i++){
-		if(bugs[i].fall){
 
-			for(var j=0;j<fingers.length;j++){
-				if(
-					bugs[i].posX <= (fingers[j].posX + 20)
-					&& fingers[j].posX <= (bugs[i].posX + 20)
-					&& bugs[i].posY <= (fingers[j].posY + 20)
-					&& fingers[j].posY <= (bugs[i].posY + 20)
-					){
-					bugs[i].fall = false;
-				}
-				else if(bugs[i].posY >= 600){
+	for(var i=0;i<bugs.length;i++){
+		// calculate bug position based on whether falling or not
+		for(var j=0;j<fingers.length;j++){
+			console.log(bugs[i].posX);
+			//console.log(fingers[j].maxX);
+			// check for bug/hand collision - if true, set fall to false, if false, set fall to true
+			if(
+				bugs[i].posX <= (fingers[j].maxX)
+				&& bugs[i].posX >= (fingers[j].minX)
+				// && fingers[j].maxX <= (bugs[i].posX + 50)
+				// && bugs[i].posY <= (fingers[j].posY + 30)
+				// && fingers[j].posY <= (bugs[i].posY + 30)
+				){
+				console.log("!!!!!!");
+				bugs[i].fall = false;
+			}
+			else {
+				bugs[i].fall = true;
+			}
+
+			// check if bugs fall between cracks
+			if(bugs[i].fall){
+				bugs[i].posY = bugs[i].posY + bugs[i].speedY*time;
+
+				if(bugs[i].posY >= 600){
 					bugs[i].fall = false;
 					bugs.splice(i, 1);
 					lives -= 1;
-					if (lives >= 1){
-						initBug();
-					}
-					else{
-					//	alert("You lost :(");
-						// init();
-					}
-				}
-				else {
-					bugs[i].posY = bugs[i].posY + bugs[i].speedY*time;
-					// bugs[i].fall = true;
-				}
-			}
-		}
-		else {
-			bugs[i].posX = bugs[i].posX+bugs[i].speedX*time;
-			if(bugs[i].posX >= 1200 || bugs[i].posX <= 0){
-					bugs[i].speedX = bugs[i].speedX*-1;
-					if (bugs[i].speedX > 0){
-						bugs[i].path = "images/LadybugRight.png";
+					count = 0;
+					if (lives == 0){
+						alert("You lost!");
 					}
 					else {
-						bugs[i].path ="images/Ladybug.png"
+						initBug();
 					}
-					bugImage.src = bugs[i].path;
-				}
-			for(var j=0;j<fingers.length;j++){
-				if(
-					bugs[i].posX >= (fingers[j].posX + 20)
-					&& fingers[j].posX >= (bugs[i].posX + 20)
-					&& bugs[i].posY >= (fingers[j].posY + 20)
-					&& fingers[j].posY >= (bugs[i].posY + 20)
-					){
-					bugs[i].fall = true;
 				}
 			}
+			else {
+				bugs[i].posY = fingers[j].posY -30;
+				bugs[i].posX = bugs[i].posX+bugs[i].speedX*time;
+			}
 		}
-
 	};
 };
 
 var render = function() {
+	// draw background, bugs, fingers and text
 	ctx.drawImage(background, 0, 0);
 
 	for(var i=0;i<bugs.length;i++){
@@ -150,21 +152,43 @@ var render = function() {
 
 	for(var j=0;j<fingers.length;j++){
 		ctx.drawImage(fingerImage, fingers[j].posX, fingers[j].posY);
-		// ctx.fillStyle="hsl(100, 100%, 60%)";
-		// ctx.fillRect(fingers[j].posX,fingers[j].posY,60,60);
 	}
 
-	// Score
+	// Lives
 	ctx.fillStyle = "rgb(250, 250, 250)";
-	ctx.font = "24px Helvetica";
+	ctx.font = "30px";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	ctx.fillText("Lives: " + lives, 32, 32);
-};
 
+	// Score
+	ctx.fillStyle = "rgb(250, 250, 250)";
+	ctx.font = "30px";
+	ctx.textAlign = "right";
+	ctx.textBaseline = "top";
+	ctx.fillText("Score: " + score, 1132, 32);
+};
 
 //updating hand positions
 var updateFingers = function(){
+	for (var i=0;i<fingers.length;i++){
+
+	if (i <1){
+		
+		fingers[i].maxX = left.getMaxX()[0] * 3;
+		fingers[i].minX = left.getMinX()[0] * 3;
+		fingers[i].maxY = left.getMaxX()[1];
+		fingers[i].minY = left.getMinX()[1];
+	}else{
+
+		fingers[i].maxX = right.getMaxX()[0];
+		fingers[i].minX = right.getMinX()[0];
+		fingers[i].maxY = right.getMaxX()[1];
+		fingers[i].minY = right.getMinX()[1];
+	}
+
+	//fingers.push(finger);
+};
 
 	// for(var j=0;j<5;j++){
 	// 	ctx.fillStyle="hsl(100, 100%, 60%)";
@@ -180,5 +204,3 @@ var updateFingers = function(){
 
 
 };
-
-init();
