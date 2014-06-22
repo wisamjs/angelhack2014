@@ -50,7 +50,7 @@ Leap.loop(function(frame) {
             //save extended fingers x,y,z positions
             if (finger.extended){
                 //Debug to console
-                console.log(finger);
+              //  console.log(finger);
 
                 if (hand.type === "left"){
 
