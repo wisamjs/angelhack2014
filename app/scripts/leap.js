@@ -51,8 +51,9 @@ $(document).ready(function(){
                 init();
                 gameBegan = true;
             }
-            $('.finger1').text(left.getMaxX());
-
+            //$('.finger1').text("Max x,y value: " + left.getMaxX()[0] + ", " + left.getMaxX()[1]);
+            //$('.finger2').text("Min x,y value: " + left.getMinX()[0] + ", " + left.getMinX()[1]);
+            //$('.finger3').text("Plus 300 : " + (left.getMaxX()[0] + 300)  + ", " + (left.getMinX()[0] + 300));
 
         });
         // if (frame.hands.length === 0){

@@ -9,7 +9,21 @@ var left = (function() {
 
     return {
         setFinger: function( finger, fingerPos, valArray ){
-            left[finger][fingerPos]= valArray;
+
+            if (valArray !== undefined){
+                var tempArr=[];
+                for (var i = 0 ; i< valArray.length; i++){
+                    if (i === 0){
+                        tempArr.push((1.7 * valArray[i]) + 300);
+                    } else if (i === 1){
+                        tempArr.push(valArray[i] + 200);
+                    }else{
+                        tempArr.push(valArray[i]);
+                    }
+                }
+
+                left[finger][fingerPos]= tempArr;
+            }
 
         },
         getFinger: function(finger){
@@ -35,6 +49,9 @@ var left = (function() {
         },
         getSlope: function(){
             return (this.getMaxX()[1] - this.getMinX()[1])/(this.getMaxX()[0] - this.getMinX()[0]);
+        },
+        normalize: function(val, power){
+            return val/power;
         }
     };
 
@@ -42,13 +59,18 @@ var left = (function() {
 
 //right-hand object
 var right = (function() {
-    var right = [ [[],[]],[[],[]],[[],[]],[[],[]],[[],[]] ];
+    var right = [ [[],[] ],[[],[]],[[],[]],[[],[]],[[],[]] ];
     var palm,
         palmWidth;
 
     return {
         setFinger: function( finger, fingerPos, valArray ){
-            right[finger][fingerPos]= valArray;
+            var tempArr=[];
+            for (var i = 0 ; i< valArray.length; i++){
+                tempArr.push(valArray[i] + 300);
+            }
+
+            right[finger][fingerPos]= tempArr;
 
         },
         getFinger: function(finger){
@@ -75,6 +97,7 @@ var right = (function() {
         getSlope: function(){
             return (this.getMaxX()[1] - this.getMinX()[1])/(this.getMaxX()[0] - this.getMinX()[0]);
         }
+
     };
 
 }());

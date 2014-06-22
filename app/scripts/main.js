@@ -24,15 +24,15 @@ var init = function(){
 
 		if (i <1){
 			var finger = {
-			maxX: left.getMaxX()[0] * 3,
-			minX:left.getMinX()[0] * 3,
-			maxY: left.getMaxX()[1],
-			minY: left.getMinX()[1]
+			maxX: left.getMaxX()[0],
+			minX: left.getMinX()[0],
+			maxY: left.getMinX()[1],
+			minY: left.getMaxX()[1]
 			};
 		}else{
 			var finger = {
 			maxX: right.getMaxX()[0],
-			minX:right.getMinX()[0],
+			minX: right.getMinX()[0],
 			maxY: right.getMaxX()[1],
 			minY: right.getMinX()[1]
 			};
@@ -71,7 +71,7 @@ var initBug = function(){
 		bug = {
 			speedX: 120, // movement in pixels per second
 			speedY: 20,
-			posX: Math.floor(Math.random()*(1200-100)+100),
+			posX: Math.floor(Math.random()*(600-400))+400,
 			posY: 0,
 			fall: true
 		};
@@ -100,17 +100,22 @@ var update = function(time){
 	for(var i=0;i<bugs.length;i++){
 		// calculate bug position based on whether falling or not
 		for(var j=0;j<fingers.length;j++){
-			console.log(bugs[i].posX);
+			$('.finger4').text("Bug position x,y: " + (bugs[i].posX) +", " + bugs[i].posY);
+			//console.log(bugs[i].posX);
 			//console.log(fingers[j].maxX);
 			// check for bug/hand collision - if true, set fall to false, if false, set fall to true
 			if(
 				bugs[i].posX <= (fingers[j].maxX)
-				&& bugs[i].posX >= (fingers[j].minX)
+				&& bugs[i].posX > (fingers[j].minX)
+				&& bugs[i].posY >= fingers[j].maxY
+				// && fingers[j].maxX <= (bugs[i].posX)
+				// && fingers[j].minX >= (bugs[i].posX)
+
 				// && fingers[j].maxX <= (bugs[i].posX + 50)
-				// && bugs[i].posY <= (fingers[j].posY + 30)
-				// && fingers[j].posY <= (bugs[i].posY + 30)
+				// && bugs[i].posY <= (fingers[j].minY + 30)
+				// && fingers[j].minY <= (bugs[i].posY + 30)
 				){
-				console.log("!!!!!!");
+				//console.log("!!!!!!");
 				bugs[i].fall = false;
 			}
 			else {
@@ -127,7 +132,8 @@ var update = function(time){
 					lives -= 1;
 					count = 0;
 					if (lives == 0){
-						alert("You lost!");
+						//alert("You lost!");
+
 					}
 					else {
 						initBug();
@@ -135,8 +141,25 @@ var update = function(time){
 				}
 			}
 			else {
-				bugs[i].posY = fingers[j].posY -30;
-				bugs[i].posX = bugs[i].posX+bugs[i].speedX*time;
+				bugs[i].posY = fingers[j].maxY;
+				// change ladybug direction every few seconds
+                count += time;
+                var rand = Math.random()*(15-4)+2;
+                //console.log(rand);
+                if (count >= rand){
+                    bugs[i].speedX = Math.floor(Math.random()*(256+156)-156);
+                    bugs[i].speedX *= -1;
+                    count = 0;
+                    	if (bug.speedX > 0){
+                        	bug.path = "images/LadybugRight.png";
+                    	}
+                    else {
+                            bug.path ="images/Ladybug.png"
+                    }
+                    bugImage.src = bug.path;
+                }
+				bugs[i].posX = bugs[i].posX-bugs[i].speedX*time;
+
 			}
 		}
 	};
@@ -175,8 +198,8 @@ var updateFingers = function(){
 
 	if (i <1){
 		
-		fingers[i].maxX = left.getMaxX()[0] * 3;
-		fingers[i].minX = left.getMinX()[0] * 3;
+		fingers[i].maxX = left.getMaxX()[0];
+		fingers[i].minX = left.getMinX()[0];
 		fingers[i].maxY = left.getMaxX()[1];
 		fingers[i].minY = left.getMinX()[1];
 	}else{
