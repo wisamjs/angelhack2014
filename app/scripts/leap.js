@@ -51,5 +51,6 @@ $(document).ready(function(){
              }
         }
 
-    }).use('screenPosition', {scale: 0.50});
+    }).use('riggedHand',{scale:1.7})
+        .connect()
 });
